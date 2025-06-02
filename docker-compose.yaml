@@ -1,0 +1,40 @@
+services:
+  service-a:
+    build:
+      context: ./service-a
+    ports:
+      - "8001:8001"
+    depends_on:
+      - service-b
+    networks:
+      - trace-net
+
+  service-b:
+    build:
+      context: ./service-b
+    ports:
+      - "8002:8002"
+    depends_on:
+      - service-c
+    networks:
+      - trace-net
+
+  service-c:
+    build:
+      context: ./service-c
+    ports:
+      - "8003:8003"
+    networks:
+      - trace-net
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.53
+    ports:
+      - "16686:16686" # UI
+      - "14268:14268" # Collector HTTP
+    networks:
+      - trace-net
+
+networks:
+  trace-net:
+    driver: bridge
