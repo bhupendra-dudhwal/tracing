@@ -19,6 +19,8 @@ func main() {
 		_, span := tracing.Tracer.Start(ctx, "service-c-handler")
 		defer span.End()
 
+		log.Printf("[Service C] TraceID: %s", span.SpanContext().TraceID())
+
 		fmt.Fprintln(w, "Handled by Service C")
 	}
 

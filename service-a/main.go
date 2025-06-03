@@ -15,16 +15,27 @@ func main() {
 	defer shutdown()
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
+
+		// inside handler
 		ctx := r.Context()
 		_, span := tracing.Tracer.Start(ctx, "service-a-handler")
 		defer span.End()
 
+		log.Printf("Service A - TraceID: %s", span.SpanContext().TraceID().String())
+
+		client := http.Client{
+			Transport: otelhttp.NewTransport(http.DefaultTransport),
+		}
+
 		url := "http://service-b:8002"
-		fmt.Println("url - ", url)
 		req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
-		fmt.Printf("\n req - %+v\nerr- %+v", req, err)
-		res, err := http.DefaultClient.Do(req)
-		fmt.Printf("\n res - %+v\nerr- %+v", res, err)
+		if err != nil {
+			http.Error(w, "Service A Request failed", http.StatusInternalServerError)
+			return
+		}
+		// otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(req.Header))
+
+		res, err := client.Do(req)
 		if err != nil {
 			http.Error(w, "Service B failed", http.StatusInternalServerError)
 			return

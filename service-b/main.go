@@ -19,12 +19,22 @@ func main() {
 		_, span := tracing.Tracer.Start(ctx, "service-b-handler")
 		defer span.End()
 
+		log.Printf("[Service B] TraceID: %s", span.SpanContext().TraceID())
+
+		client := http.Client{
+			Transport: otelhttp.NewTransport(http.DefaultTransport),
+		}
+
 		url := "http://service-c:8003"
-		fmt.Println("url - ", url)
 		req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
-		fmt.Printf("\n req - %+v\nerr- %+v", req, err)
-		res, err := http.DefaultClient.Do(req)
-		fmt.Printf("\n res - %+v\nerr- %+v", res, err)
+
+		if err != nil {
+			http.Error(w, "Service B Request failed", http.StatusInternalServerError)
+			return
+		}
+		// otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(req.Header))
+
+		res, err := client.Do(req)
 		if err != nil {
 			http.Error(w, "Service C failed", http.StatusInternalServerError)
 			return
