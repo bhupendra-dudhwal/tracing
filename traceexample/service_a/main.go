@@ -5,9 +5,12 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/bhupendra-dudhwal/traceexample"
 )
 
 func main() {
+	traceexample.Test()
 	http.Handle("/start", middleware.LoggingMiddleware("service1", http.HandlerFunc(handleStart)))
 	log.Println("[service1] ✅ Listening on :4001")
 	http.ListenAndServe(":4001", nil)
