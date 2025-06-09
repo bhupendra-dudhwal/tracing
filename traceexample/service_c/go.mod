@@ -1,4 +1,4 @@
-module servicea
+module servicec
 
 go 1.23.9
 

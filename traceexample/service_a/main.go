@@ -6,17 +6,17 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bhupendra-dudhwal/tracing/middleware"
+	"github.com/bhupendra-dudhwal/tracing"
 )
 
 func main() {
-	http.Handle("/start", middleware.LoggingMiddleware("service1", http.HandlerFunc(handleStart)))
+	http.Handle("/start", tracing.LoggingMiddleware("service1", http.HandlerFunc(handleStart)))
 	log.Println("[service1] ✅ Listening on :4001")
 	http.ListenAndServe(":4001", nil)
 }
 
 func handleStart(w http.ResponseWriter, r *http.Request) {
-	req, _ := http.NewRequest("GET", "http://service2:4002/work", nil)
+	req, _ := http.NewRequest("GET", "http://localhost:4002/work", nil)
 	req.Header.Set("X-Trace-ID", r.Header.Get("X-Trace-ID"))
 	req.Header.Set("X-Span-ID", r.Header.Get("X-Span-ID"))
 

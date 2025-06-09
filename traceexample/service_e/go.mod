@@ -1,4 +1,4 @@
-module servicea
+module servicee
 
 go 1.23.9
 
